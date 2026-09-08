@@ -1,0 +1,35 @@
+{
+  "nome": "Super San",
+  "cores": {
+    "fundo": "#0A0A0C",
+    "destaque": "#0FB5A6",
+    "texto": "#FFFFFF",
+    "texto_sombra": "rgba(0,0,0,0.45)",
+    "borda": "#FFFFFF"
+  },
+  "fonte": {
+    "familia": "\"Tusker Grotesk 4600\", Inter, 'Segoe UI', Arial, sans-serif",
+    "peso": 800,
+    "tamanho_legenda": 62,
+    "tamanho_titulo": 62,
+    "caixa_alta": true
+  },
+  "pip": {
+    "escala_padrao": 0.26,
+    "raio": 28,
+    "borda": 0,
+    "margem": 56,
+    "sombra": true
+  },
+  "animacao": {
+    "mola_rigidez": 120,
+    "mola_amortecimento": 18,
+    "duracao_padrao": 0.55
+  },
+  "legenda": {
+    "posicao_y": 0.8,
+    "max_palavras": 4,
+    "fundo": false,
+    "contorno": 3
+  }
+}

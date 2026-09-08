@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "_leia_me": [
+    "'editor' TEM que estar no include. Ele ficou de fora por um tempo e o",
+    "'npx tsc --noEmit' passava verde enquanto o editor tinha erro de tipo de",
+    "verdade — um `posicoes.tempo` num array, que só aparecia como tela preta",
+    "na hora de usar. Verificação que não olha metade do código não é",
+    "verificação, é conforto."
+  ],
+  "include": ["src", "editor", "remotion.config.ts"]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "estudio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@remotion/bundler": "4.0.517",
+    "@remotion/captions": "4.0.517",
+    "@remotion/cli": "4.0.517",
+    "@remotion/media": "4.0.517",
+    "@remotion/player": "4.0.517",
+    "@remotion/renderer": "4.0.517",
+    "@remotion/transitions": "4.0.517",
+    "@remotion/zod-types": "4.0.517",
+    "express": "^5.2.1",
+    "lucide-react": "1.37.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "remotion": "4.0.517",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.5",
+    "@vitejs/plugin-react-swc": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vite": "^8.2.2"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "_leia_me": "Este é o SEU estilo. Mexa à vontade — tudo aqui muda o visual do vídeo sem tocar em código. Depois de salvar, é só renderizar de novo.",
+  "nome": "Supremo",
+  "cores": {
+    "fundo": "#0A0A0C",
+    "destaque": "#FF2D8A",
+    "texto": "#FFFFFF",
+    "texto_sombra": "rgba(0,0,0,0.55)",
+    "borda": "#FFFFFF"
+  },
+  "fonte": {
+    "_dica": "Se instalar Montserrat ou Inter no Windows, é só trocar o primeiro nome da lista.",
+    "familia": "Montserrat, Inter, 'Segoe UI', Arial, sans-serif",
+    "peso": 900,
+    "tamanho_legenda": 74,
+    "tamanho_titulo": 130,
+    "caixa_alta": true
+  },
+  "pip": {
+    "_dica": "escala_padrao 0.26 = o quadradinho ocupa 26% da largura do quadro.",
+    "escala_padrao": 0.26,
+    "raio": 28,
+    "borda": 0,
+    "margem": 56,
+    "sombra": true
+  },
+  "animacao": {
+    "_dica": "mola_rigidez alta = movimento rápido e seco. Baixa = preguiçoso e suave. Amortecimento baixo = quica no final.",
+    "mola_rigidez": 120,
+    "mola_amortecimento": 18,
+    "duracao_padrao": 0.55
+  },
+  "legenda": {
+    "_dica": "posicao_y 0.8 = 80% da altura, ou seja, embaixo. 0.5 = no meio da tela.",
+    "posicao_y": 0.8,
+    "max_palavras": 4,
+    "fundo": false,
+    "contorno": 3
+  }
+}

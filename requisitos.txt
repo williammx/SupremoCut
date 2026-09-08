@@ -1,0 +1,24 @@
+# SupremoCut — dependências do motor Python.
+#
+# Versões travadas nas que estão em uso, não nas "mais recentes": faster-whisper
+# e ctranslate2 andam juntos, e um par desalinhado carrega o modelo e devolve
+# transcrição vazia sem erro nenhum.
+#
+#   python -m venv .venv
+#   .venv\Scripts\pip install -r requisitos.txt
+#
+# O torch aqui é a build de CUDA 12.1. Sem GPU, troque por `torch==2.5.1` puro —
+# a transcrição roda em CPU, só demora bem mais.
+#
+#   pip install torch==2.5.1+cu121 --index-url https://download.pytorch.org/whl/cu121
+
+faster-whisper==1.2.1
+ctranslate2==4.8.1
+torch==2.5.1
+numpy==2.4.6
+scipy==1.17.1
+soundfile==0.14.0
+gdown
+
+# FFmpeg NÃO é pacote Python — precisa estar no PATH.
+# Confira com:  python motor/supremo.py checar

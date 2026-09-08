@@ -1,0 +1,67 @@
+{
+  "_leia_me": "As REGRAS DE DIREÇÃO: como o sistema decide sozinho quando mostrar sua cara, quando mostrar a tela e quando fazer o quadradinho. Mexa nas listas de palavras e nos tempos.",
+
+  "corte_de_silencio": {
+    "ligado": true,
+    "_dica": "Pausa maior que 'pausa_maxima' vira corte. 'folga' é o ar que sobra antes e depois pra não ficar picotado.",
+    "pausa_maxima": 0.85,
+    "folga_antes": 0.12,
+    "folga_depois": 0.28,
+    "duracao_minima_do_trecho": 0.5
+  },
+
+  "abertura": {
+    "_dica": "Quanto tempo mostrar só a sua cara no começo, antes de entrar na tela.",
+    "segundos_de_camera": 9.0,
+    "layout": "camera"
+  },
+
+  "encerramento": {
+    "segundos_de_camera": 6.0,
+    "layout": "camera"
+  },
+
+  "gatilhos": {
+    "_dica": "Se a frase contém uma dessas palavras, o sistema troca pro layout indicado.",
+    "mostrar_tela": [
+      "olha", "olha só", "aqui", "veja", "vê aqui", "nessa tela", "vou mostrar",
+      "repara", "presta atenção", "esse botão", "clica", "clicando", "abre",
+      "essa parte", "esse código", "essa aba", "no menu", "nessa página",
+      "esse campo", "aqui em cima", "aqui embaixo", "do lado"
+    ],
+    "voltar_pra_camera": [
+      "então", "resumindo", "o ponto é", "por isso", "conclusão", "importante",
+      "presta atenção nisso", "guarda isso", "a real é", "sério", "moral da história",
+      "e é isso", "beleza", "fechou"
+    ],
+    "destacar_palavra": [
+      "importante", "atenção", "nunca", "sempre", "cuidado", "grátis", "novo",
+      "erro", "errado", "certo", "melhor", "pior", "rápido", "dobro", "metade"
+    ]
+  },
+
+  "ritmo": {
+    "_dica": "Mesmo sem gatilho, o sistema alterna de layout de tempos em tempos pra não cansar. Coloque 0 pra desligar.",
+    "trocar_layout_a_cada": 22.0,
+    "duracao_minima_da_cena": 2.2,
+    "layout_padrao_com_tela": "pip",
+    "layout_alternativo": "tela"
+  },
+
+  "transicoes": {
+    "_dica": "Qual transição usar em cada tipo de troca. Opções: corte, morph, fade, deslize, zoom_cruzado, flash.",
+    "entre_layouts": "morph",
+    "depois_de_corte_de_silencio": "corte",
+    "na_abertura": "fade",
+    "_entre_blocos": "Emenda entre dois trechos distantes do bruto (cortes manuais). Corte seco ali da solavanco.",
+    "entre_blocos": "zoom_cruzado",
+    "duracao_entre_blocos": 0.5,
+    "duracao": 0.55
+  },
+
+  "legenda": {
+    "ligada": true,
+    "estilo": "destaque",
+    "_dica": "'so_quando_mostra_tela' deixa a legenda só nos trechos de tela — útil pra não tapar seu rosto."
+  }
+}

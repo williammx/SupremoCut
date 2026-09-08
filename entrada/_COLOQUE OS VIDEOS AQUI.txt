@@ -1,0 +1,18 @@
+COLOQUE OS VIDEOS AQUI
+======================
+
+Arraste os arquivos brutos pra esta pasta e me avise no chat.
+
+Se for gravacao de tela + webcam, nomeie assim:
+
+    camera.mp4    (voce, sua webcam)
+    tela.mp4      (a gravacao da tela)
+
+Se for so um video, pode ser qualquer nome.
+
+Nao precisa cortar, sincronizar nem tratar nada antes.
+Pode estar cru, com silencio, com ruido, comecando em momentos
+diferentes. E pra isso que o sistema existe.
+
+Depois de avisar, esta pasta fica vazia de novo - os arquivos
+sao movidos pro projeto.

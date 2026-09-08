@@ -1,0 +1,43 @@
+# Dependências
+node_modules/
+.venv/
+__pycache__/
+*.pyc
+
+# Mídia e artefatos pesados — nunca versionar
+estudio/public/*/
+!estudio/public/musica
+estudio/editor-build/
+saida/
+trabalho/
+entrada/*
+!entrada/_COLOQUE OS VIDEOS AQUI.txt
+projetos/*/bruto/
+projetos/*/trabalho/
+assets/musica/*
+!assets/musica/.gitkeep
+
+# Material bruto do cliente: gigabytes de drone e câmera. É insumo, não código —
+# e um repositório que carrega o bruto de cada job vira intransportável na
+# terceira campanha.
+material/
+
+# Pacote do Remotion, refeito quando o código da composição muda. Centenas de MB
+# de cópia do public/, gerado — nunca versionado.
+.remotion/
+
+# CONTEÚDO DE CLIENTE
+#
+# Cada roteiro.json carrega a copy do anúncio, a transcrição palavra a palavra e
+# o nome do cliente. É trabalho contratado, não código: fica no disco de quem
+# produziu e não sobe pra lugar nenhum. O formato está documentado no README.
+projetos/
+
+# Segredos — NUNCA versionar
+.env
+*.key
+segredos.json
+
+# Sistema
+Thumbs.db
+desktop.ini

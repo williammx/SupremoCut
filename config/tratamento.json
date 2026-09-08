@@ -1,0 +1,69 @@
+{
+  "_leia_me": "Controla a LIMPEZA do material bruto: ruido, voz e cor. Mexa nos numeros; se quiser algo bem diferente, troque o 'preset' ou escreva sua propria cadeia de filtros FFmpeg.",
+
+  "audio": {
+    "preset": "voz_limpa",
+
+    "_presets_disponiveis": ["voz_limpa", "voz_suave", "agressivo", "nenhum"],
+
+    "reducao_ruido_db": 12,
+    "corte_grave_hz": 75,
+    "alvo_loudness_lufs": -14,
+    "pico_maximo_db": -1.5,
+
+    "presets": {
+      "voz_limpa": "highpass=f={corte_grave_hz},afftdn=nr={reducao_ruido_db}:nf=-28:tn=1,adeclick,equalizer=f=220:t=q:w=1.2:g=-2.5,equalizer=f=5200:t=q:w=2:g=2.5,acompressor=threshold=-18dB:ratio=3:attack=8:release=180:makeup=2,alimiter=limit=0.96,loudnorm=I={alvo_loudness_lufs}:TP={pico_maximo_db}:LRA=11",
+      "voz_suave": "highpass=f={corte_grave_hz},afftdn=nr={reducao_ruido_db}:nf=-30,acompressor=threshold=-20dB:ratio=2:attack=15:release=250:makeup=1.5,loudnorm=I={alvo_loudness_lufs}:TP={pico_maximo_db}:LRA=13",
+      "agressivo": "highpass=f=95,afftdn=nr=20:nf=-25:tn=1,adeclick,agate=threshold=0.012:ratio=2:attack=10:release=180,equalizer=f=300:t=q:w=1:g=-4,equalizer=f=6000:t=q:w=2:g=3.5,acompressor=threshold=-16dB:ratio=4:attack=5:release=140:makeup=3,alimiter=limit=0.95,loudnorm=I={alvo_loudness_lufs}:TP={pico_maximo_db}:LRA=9",
+      "nenhum": "anull"
+    }
+  },
+
+  "cor": {
+    "_dica": "Um preset por fonte. 'camera' e a sua webcam, 'tela' e a gravacao de tela (essa quase nunca deve ser mexida).",
+
+    "camera": {
+      "preset": "natural_plus",
+      "presets": {
+        "natural_plus": "eq=contrast=1.06:brightness=0.012:saturation=1.10:gamma=1.02,unsharp=5:5:0.45:5:5:0.0",
+        "quente": "eq=contrast=1.08:saturation=1.14,colorbalance=rs=0.03:gs=0.005:bs=-0.03,unsharp=5:5:0.4:5:5:0.0",
+        "frio_cine": "eq=contrast=1.12:saturation=0.94:gamma=0.98,colorbalance=rs=-0.02:bs=0.05,curves=all='0/0.03 0.5/0.5 1/0.97'",
+        "cru": "null"
+      }
+    },
+
+    "tela": {
+      "preset": "cru",
+      "presets": {
+        "cru": "null",
+        "nitido": "unsharp=3:3:0.3:3:3:0.0",
+        "contraste": "eq=contrast=1.05:saturation=1.05"
+      }
+    }
+  },
+
+  "ampliar": {
+    "_dica": "Leva o material para uma resolução maior. NÃO recupera detalhe — o vídeo continua macio — mas tudo que o editor desenha por cima (tarja, legenda, texto) passa a ser gerado nessa resolução, e aí sai nítido de verdade. Deixe largura/altura em null pra manter o tamanho original.",
+    "largura": null,
+    "altura": null,
+    "_exemplo": "Para anúncios verticais 9:16: largura 1080, altura 1920.",
+    "filtro": "lanczos"
+  },
+
+  "preview": {
+    "_dica": "O arquivo LEVE que o editor usa. Nao afeta a qualidade do video final — serve só pra o play não travar. Se o preview ainda engasgar, baixe a altura pra 432.",
+    "altura": 540,
+    "fps": 24,
+    "qualidade": 30,
+    "keyframe_por_segundo": 0.5,
+    "usar_gpu": true
+  },
+
+  "proxy": {
+    "_dica": "O render fica MUITO mais rapido com keyframes frequentes. Deixe usar_gpu=true pra encodar na NVENC da 3070 Ti.",
+    "usar_gpu": true,
+    "qualidade": 20,
+    "keyframe_por_segundo": 1,
+    "escala_maxima_altura": 1080
+  }
+}

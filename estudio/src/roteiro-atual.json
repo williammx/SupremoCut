@@ -1,0 +1,887 @@
+{
+  "versao": 1,
+  "versao_midia": 1788535156,
+  "projeto": "super-san-reels",
+  "fps": 30,
+  "largura": 1080,
+  "altura": 1920,
+  "fontes": {
+    "camera": {
+      "arquivo": "camera.mp4",
+      "arquivo_preview": "camera-preview.mp4",
+      "offset": 0,
+      "duracao": 41.6,
+      "largura": 1080,
+      "altura": 1920
+    },
+    "tela": null
+  },
+  "audio": {
+    "arquivo": "audio-fonte.wav",
+    "arquivo_preview": "audio-fonte-preview.m4a",
+    "picos": "picos.json",
+    "offset": 0
+  },
+  "cenas": [
+    {
+      "id": "c001",
+      "fonte_inicio": 0,
+      "duracao": 4,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "DJI_0163_SS (1).MP4 @ 0.5s — logo no tanque, camera abrindo"
+    },
+    {
+      "id": "c002",
+      "fonte_inicio": 4,
+      "duracao": 3,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "DJI_0163_SS (1).MP4 @ 5.0s — tanque revelado inteiro"
+    },
+    {
+      "id": "c003",
+      "fonte_inicio": 7,
+      "duracao": 2.5,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "DJI_0164_SS (1).MP4 @ 6.0s — rasante pela frota"
+    },
+    {
+      "id": "c004",
+      "fonte_inicio": 9.5,
+      "duracao": 2.966666666666667,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "drone-0162.mp4 @ 22.0s — cabine com a marca"
+    },
+    {
+      "id": "c005",
+      "fonte_inicio": 12.466666666666667,
+      "duracao": 3.5,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "DJI_0166_SS (2).MP4 @ 11.0s — vertical, frota em L"
+    },
+    {
+      "id": "c006",
+      "fonte_inicio": 15.966666666666667,
+      "duracao": 2.466666666666667,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "DJI_0164_SS (1).MP4 @ 20.0s — frota de perfil"
+    },
+    {
+      "id": "c007",
+      "fonte_inicio": 18.433333333333334,
+      "duracao": 3,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "drone-0162.mp4 @ 40.0s — fileiras de caminhao"
+    },
+    {
+      "id": "c008",
+      "fonte_inicio": 21.433333333333334,
+      "duracao": 2.466666666666667,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "DJI_0166_SS (2).MP4 @ 30.0s — vertical, outro angulo"
+    },
+    {
+      "id": "c009",
+      "fonte_inicio": 23.9,
+      "duracao": 3,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "DJI_0168_SS (1).MP4 @ 5.0s — orbita na altura do caminhao"
+    },
+    {
+      "id": "c010",
+      "fonte_inicio": 26.9,
+      "duracao": 3.5,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "drone-0161.mp4 @ 12.0s — operador em cima do tanque"
+    },
+    {
+      "id": "c011",
+      "fonte_inicio": 30.4,
+      "duracao": 2.966666666666667,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "DJI_0168_SS (1).MP4 @ 30.0s — abre pra fachada"
+    },
+    {
+      "id": "c012",
+      "fonte_inicio": 33.36666666666667,
+      "duracao": 4.466666666666667,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "DJI_0163_SS (1).MP4 @ 26.0s — a base inteira"
+    },
+    {
+      "id": "c013",
+      "fonte_inicio": 37.833333333333336,
+      "duracao": 3.7666666666666666,
+      "layout": "camera",
+      "entrada": {
+        "tipo": "corte"
+      },
+      "foco": null,
+      "velocidade": 1,
+      "volume": 0,
+      "nota": "DJI_0163_SS (1).MP4 @ 30.5s — fecho, patio e galpao"
+    }
+  ],
+  "legendas": {
+    "estilo": "nenhum",
+    "ligada_em": [],
+    "base_tempo": "fonte",
+    "palavras": []
+  },
+  "overlays": [
+    {
+      "id": "l01",
+      "inicio": 0.8,
+      "duracao": 4.2,
+      "tipo": "lower_third",
+      "texto": "Gestão de resíduos",
+      "subtexto": "para grandes operações industriais",
+      "posicao": {
+        "x": 0.08,
+        "y": 0.72
+      }
+    },
+    {
+      "id": "l02",
+      "inicio": 12.7,
+      "duracao": 4,
+      "tipo": "lower_third",
+      "texto": "Mais de 200 veículos",
+      "subtexto": "e equipamentos próprios",
+      "posicao": {
+        "x": 0.08,
+        "y": 0.72
+      }
+    },
+    {
+      "id": "l03",
+      "inicio": 21.7,
+      "duracao": 4,
+      "tipo": "lower_third",
+      "texto": "Mais de 10 estados",
+      "subtexto": "de presença no país",
+      "posicao": {
+        "x": 0.08,
+        "y": 0.72
+      }
+    },
+    {
+      "id": "l04",
+      "inicio": 27.2,
+      "duracao": 3.3,
+      "tipo": "lower_third",
+      "texto": "Uma estrutura",
+      "subtexto": "pensada para não parar",
+      "posicao": {
+        "x": 0.08,
+        "y": 0.72
+      }
+    },
+    {
+      "id": "fecho",
+      "inicio": 34,
+      "duracao": 6,
+      "tipo": "titulo",
+      "texto": "Estrutura que sustenta grandes operações",
+      "posicao": {
+        "x": 0.5,
+        "y": 0.5
+      }
+    }
+  ],
+  "musica": null,
+  "marcadores": [],
+  "trilha_audio": [
+    {
+      "id": "a_c001",
+      "inicio": 0,
+      "duracao": 4,
+      "fonte_inicio": 0,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c001",
+      "nota": "DJI_0163_SS (1).MP4 @ 0.5s — logo no tanque, camera abrindo"
+    },
+    {
+      "id": "a_c002",
+      "inicio": 8,
+      "duracao": 3,
+      "fonte_inicio": 4,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c002",
+      "nota": "DJI_0163_SS (1).MP4 @ 5.0s — tanque revelado inteiro"
+    },
+    {
+      "id": "a_c003",
+      "inicio": 11,
+      "duracao": 2.5,
+      "fonte_inicio": 7,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c003",
+      "nota": "DJI_0164_SS (1).MP4 @ 6.0s — rasante pela frota"
+    },
+    {
+      "id": "a_c004",
+      "inicio": 13.5,
+      "duracao": 2.966666666666667,
+      "fonte_inicio": 9.5,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c004",
+      "nota": "drone-0162.mp4 @ 22.0s — cabine com a marca"
+    },
+    {
+      "id": "a_c005",
+      "inicio": 16.4667,
+      "duracao": 3.5,
+      "fonte_inicio": 12.466666666666667,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c005",
+      "nota": "DJI_0166_SS (2).MP4 @ 11.0s — vertical, frota em L"
+    },
+    {
+      "id": "a_c006",
+      "inicio": 19.9667,
+      "duracao": 2.466666666666667,
+      "fonte_inicio": 15.966666666666667,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c006",
+      "nota": "DJI_0164_SS (1).MP4 @ 20.0s — frota de perfil"
+    },
+    {
+      "id": "a_c007",
+      "inicio": 22.4333,
+      "duracao": 3,
+      "fonte_inicio": 18.433333333333334,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c007",
+      "nota": "drone-0162.mp4 @ 40.0s — fileiras de caminhao"
+    },
+    {
+      "id": "a_c008",
+      "inicio": 25.4333,
+      "duracao": 2.466666666666667,
+      "fonte_inicio": 21.433333333333334,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c008",
+      "nota": "DJI_0166_SS (2).MP4 @ 30.0s — vertical, outro angulo"
+    },
+    {
+      "id": "a_c009",
+      "inicio": 27.9,
+      "duracao": 3,
+      "fonte_inicio": 23.9,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c009",
+      "nota": "DJI_0168_SS (1).MP4 @ 5.0s — orbita na altura do caminhao"
+    },
+    {
+      "id": "a_c010",
+      "inicio": 30.9,
+      "duracao": 3.5,
+      "fonte_inicio": 26.9,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c010",
+      "nota": "drone-0161.mp4 @ 12.0s — operador em cima do tanque"
+    },
+    {
+      "id": "a_c011",
+      "inicio": 34.4,
+      "duracao": 2.966666666666667,
+      "fonte_inicio": 30.4,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c011",
+      "nota": "DJI_0168_SS (1).MP4 @ 30.0s — abre pra fachada"
+    },
+    {
+      "id": "a_c012",
+      "inicio": 37.3667,
+      "duracao": 4.466666666666667,
+      "fonte_inicio": 33.36666666666667,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c012",
+      "nota": "DJI_0163_SS (1).MP4 @ 26.0s — a base inteira"
+    },
+    {
+      "id": "a_c013",
+      "inicio": 41.8333,
+      "duracao": 3.7666666666666666,
+      "fonte_inicio": 37.833333333333336,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "c013",
+      "nota": "DJI_0163_SS (1).MP4 @ 30.5s — fecho, patio e galpao"
+    },
+    {
+      "id": "a_cmtn5hlaz9gs",
+      "inicio": 4,
+      "duracao": 4,
+      "fonte_inicio": 0,
+      "volume": 0,
+      "velocidade": 1,
+      "fade_entrada": 0,
+      "fade_saida": 0,
+      "vinculado_a": "cmtn5hlaz9gs",
+      "nota": "DJI_0163_SS (1).MP4 @ 0.5s — logo no tanque, camera abrindo"
+    }
+  ],
+  "camadas": [
+    {
+      "id": "veu_0_8",
+      "tipo": "forma",
+      "nome": "véu de leitura",
+      "inicio": 0.8,
+      "duracao": 4.2,
+      "x": 0,
+      "y": 0.58,
+      "largura": 1,
+      "altura": 0.42000000000000004,
+      "cor": "#04241F",
+      "raio": 0,
+      "degrade": {
+        "sentido": "cima",
+        "opacidade": 0.8
+      },
+      "entrada": {
+        "tipo": "surgir",
+        "duracao": 0.4
+      },
+      "saida": {
+        "tipo": "sumir",
+        "duracao": 0.4
+      }
+    },
+    {
+      "id": "forma_0",
+      "inicio": 0.8,
+      "duracao": 4.2,
+      "tipo": "forma",
+      "nome": "barra do lettering",
+      "x": 0.08,
+      "y": 0.72,
+      "largura": 0.3621399176954732,
+      "altura": 0.005555555555555555,
+      "cor": "#0FB5A6",
+      "raio": 999,
+      "entrada": {
+        "tipo": "abrir",
+        "duracao": 0.5
+      }
+    },
+    {
+      "tipo": "texto",
+      "largura": 0.92,
+      "tamanho": 62,
+      "peso": 800,
+      "cor": "#FFFFFF",
+      "alinhamento": "esquerda",
+      "caixa_alta": false,
+      "entrelinha": 1.02,
+      "contorno": 0,
+      "sombra": true,
+      "id": "txt_1",
+      "inicio": 0.8,
+      "duracao": 4.2,
+      "texto": "Gestão de resíduos",
+      "nome": "Gestão de resíduos",
+      "x": 0.08,
+      "y": 0.7385185185185185,
+      "entrada": {
+        "tipo": "deslizar",
+        "duracao": 0.5
+      }
+    },
+    {
+      "tipo": "texto",
+      "largura": 0.92,
+      "tamanho": 32,
+      "peso": 400,
+      "cor": "#FFFFFF",
+      "alinhamento": "esquerda",
+      "caixa_alta": false,
+      "entrelinha": 1.15,
+      "contorno": 0,
+      "sombra": true,
+      "id": "txt_2",
+      "inicio": 0.8,
+      "duracao": 4.2,
+      "texto": "para grandes operações industriais",
+      "nome": "para grandes operações industriais",
+      "x": 0.08,
+      "y": 0.8063333333333332,
+      "opacidade": 0.82,
+      "entrada": {
+        "tipo": "deslizar",
+        "duracao": 0.5
+      },
+      "fonte": "\"Google Sans\", Inter, 'Segoe UI', Arial, sans-serif"
+    },
+    {
+      "id": "veu_12_7",
+      "tipo": "forma",
+      "nome": "véu de leitura",
+      "inicio": 12.7,
+      "duracao": 4,
+      "x": 0,
+      "y": 0.58,
+      "largura": 1,
+      "altura": 0.42000000000000004,
+      "cor": "#04241F",
+      "raio": 0,
+      "degrade": {
+        "sentido": "cima",
+        "opacidade": 0.8
+      },
+      "entrada": {
+        "tipo": "surgir",
+        "duracao": 0.4
+      },
+      "saida": {
+        "tipo": "sumir",
+        "duracao": 0.4
+      }
+    },
+    {
+      "id": "forma_3",
+      "inicio": 12.7,
+      "duracao": 4,
+      "tipo": "forma",
+      "nome": "barra do lettering",
+      "x": 0.08,
+      "y": 0.72,
+      "largura": 0.3621399176954732,
+      "altura": 0.005555555555555555,
+      "cor": "#0FB5A6",
+      "raio": 999,
+      "entrada": {
+        "tipo": "abrir",
+        "duracao": 0.5
+      }
+    },
+    {
+      "tipo": "texto",
+      "largura": 0.92,
+      "tamanho": 62,
+      "peso": 800,
+      "cor": "#FFFFFF",
+      "alinhamento": "esquerda",
+      "caixa_alta": false,
+      "entrelinha": 1.02,
+      "contorno": 0,
+      "sombra": true,
+      "id": "txt_4",
+      "inicio": 12.7,
+      "duracao": 4,
+      "texto": "Mais de 200 veículos",
+      "nome": "Mais de 200 veículos",
+      "x": 0.08,
+      "y": 0.7385185185185185,
+      "entrada": {
+        "tipo": "deslizar",
+        "duracao": 0.5
+      }
+    },
+    {
+      "tipo": "texto",
+      "largura": 0.92,
+      "tamanho": 32,
+      "peso": 400,
+      "cor": "#FFFFFF",
+      "alinhamento": "esquerda",
+      "caixa_alta": false,
+      "entrelinha": 1.15,
+      "contorno": 0,
+      "sombra": true,
+      "id": "txt_5",
+      "inicio": 12.7,
+      "duracao": 4,
+      "texto": "e equipamentos próprios",
+      "nome": "e equipamentos próprios",
+      "x": 0.08,
+      "y": 0.8063333333333332,
+      "opacidade": 0.82,
+      "entrada": {
+        "tipo": "deslizar",
+        "duracao": 0.5
+      },
+      "fonte": "\"Google Sans\", Inter, 'Segoe UI', Arial, sans-serif"
+    },
+    {
+      "id": "veu_21_7",
+      "tipo": "forma",
+      "nome": "véu de leitura",
+      "inicio": 21.7,
+      "duracao": 4,
+      "x": 0,
+      "y": 0.58,
+      "largura": 1,
+      "altura": 0.42000000000000004,
+      "cor": "#04241F",
+      "raio": 0,
+      "degrade": {
+        "sentido": "cima",
+        "opacidade": 0.8
+      },
+      "entrada": {
+        "tipo": "surgir",
+        "duracao": 0.4
+      },
+      "saida": {
+        "tipo": "sumir",
+        "duracao": 0.4
+      }
+    },
+    {
+      "id": "forma_6",
+      "inicio": 21.7,
+      "duracao": 4,
+      "tipo": "forma",
+      "nome": "barra do lettering",
+      "x": 0.08,
+      "y": 0.72,
+      "largura": 0.3621399176954732,
+      "altura": 0.005555555555555555,
+      "cor": "#0FB5A6",
+      "raio": 999,
+      "entrada": {
+        "tipo": "abrir",
+        "duracao": 0.5
+      }
+    },
+    {
+      "tipo": "texto",
+      "largura": 0.92,
+      "tamanho": 62,
+      "peso": 800,
+      "cor": "#FFFFFF",
+      "alinhamento": "esquerda",
+      "caixa_alta": false,
+      "entrelinha": 1.02,
+      "contorno": 0,
+      "sombra": true,
+      "id": "txt_7",
+      "inicio": 21.7,
+      "duracao": 4,
+      "texto": "Mais de 10 estados",
+      "nome": "Mais de 10 estados",
+      "x": 0.08,
+      "y": 0.7385185185185185,
+      "entrada": {
+        "tipo": "deslizar",
+        "duracao": 0.5
+      }
+    },
+    {
+      "tipo": "texto",
+      "largura": 0.92,
+      "tamanho": 32,
+      "peso": 400,
+      "cor": "#FFFFFF",
+      "alinhamento": "esquerda",
+      "caixa_alta": false,
+      "entrelinha": 1.15,
+      "contorno": 0,
+      "sombra": true,
+      "id": "txt_8",
+      "inicio": 21.7,
+      "duracao": 4,
+      "texto": "de presença no país",
+      "nome": "de presença no país",
+      "x": 0.08,
+      "y": 0.8063333333333332,
+      "opacidade": 0.82,
+      "entrada": {
+        "tipo": "deslizar",
+        "duracao": 0.5
+      },
+      "fonte": "\"Google Sans\", Inter, 'Segoe UI', Arial, sans-serif"
+    },
+    {
+      "id": "veu_27_2",
+      "tipo": "forma",
+      "nome": "véu de leitura",
+      "inicio": 27.2,
+      "duracao": 3.3,
+      "x": 0,
+      "y": 0.58,
+      "largura": 1,
+      "altura": 0.42000000000000004,
+      "cor": "#04241F",
+      "raio": 0,
+      "degrade": {
+        "sentido": "cima",
+        "opacidade": 0.8
+      },
+      "entrada": {
+        "tipo": "surgir",
+        "duracao": 0.4
+      },
+      "saida": {
+        "tipo": "sumir",
+        "duracao": 0.4
+      }
+    },
+    {
+      "id": "forma_9",
+      "inicio": 27.2,
+      "duracao": 3.3,
+      "tipo": "forma",
+      "nome": "barra do lettering",
+      "x": 0.08,
+      "y": 0.72,
+      "largura": 0.3621399176954732,
+      "altura": 0.005555555555555555,
+      "cor": "#0FB5A6",
+      "raio": 999,
+      "entrada": {
+        "tipo": "abrir",
+        "duracao": 0.5
+      }
+    },
+    {
+      "tipo": "texto",
+      "largura": 0.92,
+      "tamanho": 62,
+      "peso": 800,
+      "cor": "#FFFFFF",
+      "alinhamento": "esquerda",
+      "caixa_alta": false,
+      "entrelinha": 1.02,
+      "contorno": 0,
+      "sombra": true,
+      "id": "txt_a",
+      "inicio": 27.2,
+      "duracao": 3.3,
+      "texto": "Uma estrutura",
+      "nome": "Uma estrutura",
+      "x": 0.08,
+      "y": 0.7385185185185185,
+      "entrada": {
+        "tipo": "deslizar",
+        "duracao": 0.5
+      }
+    },
+    {
+      "tipo": "texto",
+      "largura": 0.92,
+      "tamanho": 32,
+      "peso": 400,
+      "cor": "#FFFFFF",
+      "alinhamento": "esquerda",
+      "caixa_alta": false,
+      "entrelinha": 1.15,
+      "contorno": 0,
+      "sombra": true,
+      "id": "txt_b",
+      "inicio": 27.2,
+      "duracao": 3.3,
+      "texto": "pensada para não parar",
+      "nome": "pensada para não parar",
+      "x": 0.08,
+      "y": 0.8063333333333332,
+      "opacidade": 0.82,
+      "entrada": {
+        "tipo": "deslizar",
+        "duracao": 0.5
+      },
+      "fonte": "\"Google Sans\", Inter, 'Segoe UI', Arial, sans-serif"
+    },
+    {
+      "id": "fecho_veu",
+      "tipo": "forma",
+      "nome": "véu de leitura",
+      "inicio": 34,
+      "duracao": 6,
+      "x": 0,
+      "y": 0.58,
+      "largura": 1,
+      "altura": 0.42000000000000004,
+      "cor": "#04241F",
+      "raio": 0,
+      "degrade": {
+        "sentido": "cima",
+        "opacidade": 0.8
+      },
+      "entrada": {
+        "tipo": "surgir",
+        "duracao": 0.4
+      },
+      "saida": {
+        "tipo": "sumir",
+        "duracao": 0.4
+      }
+    },
+    {
+      "id": "fecho_barra",
+      "inicio": 34,
+      "duracao": 6,
+      "tipo": "forma",
+      "nome": "barra do lettering",
+      "x": 0.08,
+      "y": 0.6614444444444444,
+      "largura": 0.3621399176954732,
+      "altura": 0.005555555555555555,
+      "cor": "#0FB5A6",
+      "raio": 999,
+      "entrada": {
+        "tipo": "abrir",
+        "duracao": 0.5
+      }
+    },
+    {
+      "tipo": "texto",
+      "largura": 0.92,
+      "tamanho": 62,
+      "peso": 800,
+      "cor": "#FFFFFF",
+      "alinhamento": "esquerda",
+      "caixa_alta": false,
+      "entrelinha": 1.02,
+      "contorno": 0,
+      "sombra": true,
+      "id": "fecho_titulo",
+      "inicio": 34,
+      "duracao": 6,
+      "texto": "As melhores bombas\nda Itália",
+      "nome": "As melhores bombas da Itália",
+      "x": 0.08,
+      "y": 0.6799629629629629,
+      "entrada": {
+        "tipo": "deslizar",
+        "duracao": 0.5
+      }
+    },
+    {
+      "tipo": "texto",
+      "largura": 0.92,
+      "tamanho": 32,
+      "peso": 400,
+      "cor": "#FFFFFF",
+      "alinhamento": "esquerda",
+      "caixa_alta": false,
+      "entrelinha": 1.15,
+      "contorno": 0,
+      "sombra": true,
+      "id": "fecho_sub",
+      "inicio": 34,
+      "duracao": 6,
+      "texto": "referência na Europa",
+      "nome": "referência na Europa",
+      "x": 0.08,
+      "y": 0.8063333333333332,
+      "opacidade": 0.82,
+      "entrada": {
+        "tipo": "deslizar",
+        "duracao": 0.5
+      },
+      "fonte": "\"Google Sans\", Inter, 'Segoe UI', Arial, sans-serif"
+    }
+  ]
+}

@@ -1,0 +1,1868 @@
+/* ============================================================================
+   SupremoCut — sistema visual
+   ============================================================================
+
+   Editor de vídeo é tela escura por obrigação, não por moda: o vídeo é a coisa
+   mais clara que existe aqui, e tudo em volta tem que recuar pra ele. Por isso
+   a interface inteira vive entre o quase-preto e o cinza médio, e a cor só
+   aparece onde significa alguma coisa.
+
+   O que a cor quer dizer, sem exceção:
+     rosa   — o que está selecionado agora, e a ação principal. Só isso.
+     verde  — som. A pista de áudio, os clipes, o ímã pegando.
+     âmbar  — atenção: não salvo, marcador, aviso.
+     vermelho — apagar.
+
+   Profundidade sem sombra pesada: cada superfície erguida ganha um fio de luz
+   de 1px no topo (`inset 0 1px 0 rgba(255,255,255,.05)`). É como painel de
+   equipamento de estúdio pega volume, e custa um shadow em vez de uma borda a
+   mais competindo por atenção.
+============================================================================ */
+
+:root {
+  /* ---- superfícies, do fundo para a frente ---- */
+  --palco: #060709;
+  --fundo: #0b0c0f;
+  --painel: #131519;
+  --painel-alto: #1b1e25;
+  --painel-topo: #23272f;
+  --borda: #262a33;
+  --borda-forte: #333947;
+
+  /* ---- texto ---- */
+  --texto: #e9ebf1;
+  --texto-medio: #a4abbb;
+  --texto-fraco: #7b8296;
+
+  /* ---- significado ---- */
+  --destaque: #ff2d8a;
+  --destaque-claro: #ff5ba5;
+  --destaque-fraco: rgba(255, 45, 138, 0.14);
+  --destaque-vidro: rgba(255, 45, 138, 0.07);
+  --ok: #2dd4a7;
+  --ok-fraco: rgba(45, 212, 167, 0.14);
+  --aviso: #ffb020;
+  --aviso-fraco: rgba(255, 176, 32, 0.13);
+  --perigo: #ff5c6a;
+  --perigo-fraco: rgba(255, 92, 106, 0.13);
+
+  /* ---- forma ---- */
+  --raio-p: 6px;
+  --raio: 9px;
+  --raio-g: 13px;
+
+  /* ---- profundidade ---- */
+  --luz-topo: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --sombra-p: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --sombra: 0 6px 20px rgba(0, 0, 0, 0.45);
+  --sombra-g: 0 18px 50px rgba(0, 0, 0, 0.6);
+  --foco: 0 0 0 3px rgba(255, 45, 138, 0.22);
+
+  /* ---- movimento ----
+     Uma curva só no app inteiro. Tempo diferente por peso do elemento: o que
+     é pequeno responde rápido, o que é grande se move com alguma inércia. */
+  --curva: cubic-bezier(0.32, 0.72, 0, 1);
+  --rapido: 0.12s var(--curva);
+  --medio: 0.2s var(--curva);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#raiz {
+  height: 100%;
+}
+
+body {
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: Inter, "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  font-size: 13px;
+  line-height: 1.45;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  /* Números de largura fixa em TODA a interface. Num editor quase todo número
+     está ao lado de outro que muda — relógio, duração, valor de controle — e
+     dígito de largura variável faz a coluna inteira tremer a cada quadro. */
+  font-variant-numeric: tabular-nums;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+/* Foco visível sempre, mas só pra quem navega por teclado. Anel em vez de
+   contorno: acompanha o raio do elemento em vez de desenhar um retângulo. */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  box-shadow: var(--foco);
+  border-color: var(--destaque) !important;
+}
+
+::selection {
+  background: var(--destaque-fraco);
+}
+
+/* ---- barra de rolagem ----
+   A do Windows é clara e grossa demais pro resto da tela; some quando não
+   está em uso e aparece discreta quando está. */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--borda);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--borda-forte);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* ---- ícones ----
+   Todo ícone é traço, nunca preenchido, e herda a cor do texto ao redor. É o
+   que faz um botão desligado parecer desligado sem precisar de segunda regra. */
+.lucide {
+  flex-shrink: 0;
+  stroke-width: 1.75;
+}
+
+/* ============================================================== estrutura == */
+
+/*
+  ATENÇÃO: os minmax(0, ...) e min-width/min-height: 0 abaixo NÃO são enfeite.
+  Item de grid tem min-width: auto por padrão, então um filho largo (a pista da
+  timeline passa de 11.000px num vídeo de 13 min) estica a grade inteira e joga
+  o painel lateral pra fora da tela. Sem isso o layout explode.
+*/
+
+.app {
+  display: grid;
+  /* 272px embaixo: régua + pista de vídeo + pista de áudio */
+  grid-template-rows: 52px minmax(0, 1fr) 272px;
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+  overflow: hidden;
+}
+
+.miolo {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 344px;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  border-top: 1px solid var(--borda);
+  border-bottom: 1px solid var(--borda);
+}
+
+.palco {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px;
+  /* mais escuro que o resto: dá a impressão de sala apagada em volta do vídeo */
+  background: var(--palco);
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* O Player do Remotion já encaixa a composição dentro da caixa preservando a
+   proporção, então a caixa só precisa preencher o palco. */
+.palco-caixa {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  position: relative;
+  /* vira a unidade de medida das guias de zona segura (cqw/cqh abaixo) */
+  container-type: size;
+}
+
+/* ---- zonas seguras 9:16 (guia do editor, não vai pro render) ---- */
+
+.zona-segura {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* A mesma conta que o Player faz pra encaixar o vídeo: cabe na largura ou na
+     altura, o que apertar primeiro. `cqw`/`cqh` medem o palco (que declara
+     `container-type: size` acima), e `--ar` é largura/altura do projeto, posto
+     inline por Palco.tsx. */
+  width: min(100cqw, calc(100cqh * var(--ar, 1.7778)));
+  height: min(100cqh, calc(100cqw / var(--ar, 1.7778)));
+  z-index: 10;
+  pointer-events: none;
+}
+.zs-faixa {
+  position: absolute;
+  background: rgba(255, 45, 138, 0.08);
+  border: 1px dashed rgba(255, 45, 138, 0.45);
+}
+.zs-faixa::after {
+  content: attr(data-rot);
+  position: absolute;
+  top: 4px;
+  left: 7px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(255, 45, 138, 0.9);
+}
+/* proporções medidas na interface do TikTok/Reels em 1080x1920 */
+.zs-topo {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 9%;
+}
+.zs-base {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 17%;
+}
+.zs-direita {
+  top: 9%;
+  bottom: 17%;
+  right: 0;
+  width: 20%;
+}
+
+/* ================================================================== barra == */
+
+.barra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: var(--painel);
+  box-shadow: var(--luz-topo);
+}
+
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  font-size: 14.5px;
+  padding-right: 4px;
+  user-select: none;
+}
+.marca .marca-nome span {
+  color: var(--destaque);
+}
+.marca .lucide {
+  color: var(--destaque);
+}
+
+.espaco {
+  flex: 1;
+}
+
+/* fio vertical separando grupos de ação na barra */
+.divisor {
+  width: 1px;
+  height: 20px;
+  background: var(--borda);
+  flex-shrink: 0;
+  margin: 0 2px;
+}
+
+/* ================================================================ botões == */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  border-radius: var(--raio-p);
+  background: var(--painel-alto);
+  border: 1px solid var(--borda);
+  font-weight: 500;
+  font-size: 12.5px;
+  white-space: nowrap;
+  transition: background var(--rapido), border-color var(--rapido),
+    color var(--rapido), transform var(--rapido);
+  box-shadow: var(--luz-topo);
+}
+.btn:hover:not(:disabled) {
+  background: var(--painel-topo);
+  border-color: var(--borda-forte);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.btn.principal {
+  background: var(--destaque);
+  border-color: var(--destaque);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: var(--luz-topo), 0 2px 10px rgba(255, 45, 138, 0.28);
+}
+.btn.principal:hover:not(:disabled) {
+  background: var(--destaque-claro);
+  border-color: var(--destaque-claro);
+}
+
+/* Sem caixa até você chegar perto. É o peso certo pro que fica sempre na tela
+   mas raramente é clicado — exportar, atalhos, diagnóstico. */
+.btn.sutil {
+  background: transparent;
+  border-color: transparent;
+  color: var(--texto-fraco);
+  box-shadow: none;
+}
+.btn.sutil:hover:not(:disabled) {
+  color: var(--texto);
+  background: var(--painel-alto);
+  border-color: var(--borda);
+}
+
+/* interruptor ligado: a cor diz o estado, não um rótulo extra */
+.btn.ligado {
+  background: var(--destaque-fraco);
+  border-color: var(--destaque);
+  color: var(--destaque-claro);
+}
+.btn.ligado:hover:not(:disabled) {
+  background: rgba(255, 45, 138, 0.2);
+  border-color: var(--destaque);
+  color: var(--destaque-claro);
+}
+
+/* só ícone, quadrado */
+.btn.icone {
+  padding: 7px;
+  gap: 0;
+}
+
+/* botão que ocupa a largura do painel */
+.btn.cheio,
+.opcao.cheio {
+  width: 100%;
+  justify-content: center;
+}
+
+.selecao {
+  padding: 7px 30px 7px 11px;
+  border-radius: var(--raio-p);
+  background-color: var(--painel-alto);
+  border: 1px solid var(--borda);
+  font-size: 12.5px;
+  font-weight: 500;
+  box-shadow: var(--luz-topo);
+  transition: border-color var(--rapido);
+  /* seta própria: a nativa do Windows é cinza-claro e destoa de tudo */
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237b8296' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 9px center;
+}
+.selecao:hover {
+  border-color: var(--borda-forte);
+}
+.selecao option {
+  background: var(--painel-alto);
+}
+
+.aviso-salvar {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--aviso);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+/* pontinho pulsando: chama o olho sem ocupar espaço */
+.aviso-salvar::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--aviso);
+  animation: pulsa 1.8s ease-in-out infinite;
+}
+@keyframes pulsa {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.progresso {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11.5px;
+  color: var(--texto-medio);
+  padding: 0 4px;
+}
+.progresso .barrinha {
+  width: 110px;
+  height: 5px;
+  border-radius: 99px;
+  background: var(--borda);
+  overflow: hidden;
+}
+.progresso .barrinha i {
+  display: block;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, var(--destaque), var(--destaque-claro));
+  transition: width 0.3s var(--curva);
+}
+
+/* =============================================================== painéis == */
+
+.lateral {
+  background: var(--painel);
+  border-left: 1px solid var(--borda);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+/* Ícone em cima, rótulo embaixo: com seis abas em 344px, lado a lado não cabe
+   sem cortar palavra. Empilhado, cada aba vira um alvo largo e legível. */
+.abas {
+  display: flex;
+  border-bottom: 1px solid var(--borda);
+  flex-shrink: 0;
+  background: var(--fundo);
+  padding: 0 4px;
+}
+.aba {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 9px 2px 8px;
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--texto-fraco);
+  border-bottom: 2px solid transparent;
+  transition: color var(--rapido), border-color var(--rapido);
+  position: relative;
+}
+.aba:hover {
+  color: var(--texto-medio);
+}
+.aba.ativa {
+  color: var(--destaque-claro);
+  border-bottom-color: var(--destaque);
+}
+.aba .lucide {
+  opacity: 0.9;
+}
+
+.painel-corpo {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 14px 40px;
+  flex: 1;
+  scrollbar-gutter: stable;
+}
+
+/* ---- grupo ----
+   Cabeçalho clicável que abre e fecha. Os painéis são longos: o de legenda
+   passa de mil pixels com a lista de palavras aberta. Poder fechar o que não
+   está em uso é a diferença entre rolar e achar. */
+.grupo {
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--borda);
+  padding-bottom: 14px;
+}
+.grupo:last-child {
+  border-bottom: none;
+}
+
+.grupo-topo {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  padding: 11px 2px 10px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+  color: var(--texto-medio);
+  transition: color var(--rapido);
+  text-align: left;
+}
+.grupo-topo:hover {
+  color: var(--texto);
+}
+.grupo-topo .lucide.chevron {
+  margin-left: auto;
+  color: var(--texto-fraco);
+  transition: transform var(--medio);
+}
+.grupo.fechado .grupo-topo .lucide.chevron {
+  transform: rotate(-90deg);
+}
+.grupo.fechado {
+  padding-bottom: 0;
+}
+.grupo-corpo {
+  padding-top: 2px;
+}
+
+/* ---- linha de controle ---- */
+
+.linha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 9px;
+}
+.linha:last-child {
+  margin-bottom: 0;
+}
+.linha label {
+  flex: 0 0 88px;
+  color: var(--texto-fraco);
+  font-size: 12px;
+}
+.linha .valor {
+  flex: 0 0 50px;
+  text-align: right;
+  color: var(--texto-medio);
+  font-size: 11.5px;
+  font-weight: 500;
+}
+
+/* Texto de apoio. Aparece muito, então tem classe própria em vez de style
+   inline repetido em oito arquivos. */
+.dica {
+  color: var(--texto-fraco);
+  font-size: 11.5px;
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+.dica:last-child {
+  margin-bottom: 0;
+}
+.dica strong {
+  color: var(--texto-medio);
+  font-weight: 600;
+}
+
+.rotulo-mini {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--texto-fraco);
+  margin: 14px 0 7px;
+}
+
+/* ---- deslizante ----
+   Desenhado à mão porque o nativo do Chrome no Windows é um trilho cinza
+   grosso que não combina com nada aqui. O importante é o peão: grande o
+   suficiente pra pegar com o mouse sem mirar. */
+input[type="range"] {
+  flex: 1;
+  min-width: 0;
+  appearance: none;
+  height: 18px;
+  background: transparent;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--borda);
+}
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  margin-top: -5px;
+  border-radius: 99px;
+  background: #fff;
+  border: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  transition: transform var(--rapido), box-shadow var(--rapido);
+}
+input[type="range"]:hover::-webkit-slider-thumb {
+  transform: scale(1.18);
+}
+input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.28);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), var(--foco);
+}
+input[type="range"]:focus-visible {
+  box-shadow: none;
+}
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), var(--foco);
+}
+
+/* ---- campos ---- */
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 10px;
+  border-radius: var(--raio-p);
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  font-size: 12.5px;
+  transition: border-color var(--rapido), background var(--rapido);
+}
+input[type="text"]:hover,
+input[type="number"]:hover,
+textarea:hover {
+  border-color: var(--borda-forte);
+}
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--destaque);
+  background: var(--painel-alto);
+}
+input::placeholder {
+  color: var(--texto-fraco);
+  opacity: 0.7;
+}
+
+/* Some as setinhas do campo numérico: elas nunca são clicadas e roubam
+   metade da largura útil num painel de 344px. */
+input[type="number"] {
+  appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  appearance: none;
+  margin: 0;
+}
+
+input[type="color"] {
+  width: 34px;
+  height: 30px;
+  flex: 0 0 34px;
+  padding: 3px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-p);
+  background: var(--fundo);
+  cursor: pointer;
+  transition: border-color var(--rapido);
+}
+input[type="color"]:hover {
+  border-color: var(--borda-forte);
+}
+input[type="color"]::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+input[type="color"]::-webkit-color-swatch {
+  border: none;
+  border-radius: 3px;
+}
+
+/* ---- pintar um pedaço do texto ---- */
+
+.pintar-trecho {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+/*
+  Desativado precisa PARECER desativado.
+
+  A linha só funciona quando há texto selecionado no campo de cima; sem o
+  esmaecido, quem clicasse sem selecionar nada acharia que a ferramenta está
+  quebrada em vez de perceber que falta selecionar.
+*/
+.pintar-trecho input:disabled,
+.pintar-trecho .chip:disabled,
+.pintar-trecho .chip-texto:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.pintar-trecho .chip {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  padding: 0;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-p);
+  cursor: pointer;
+  transition: border-color var(--rapido);
+}
+.pintar-trecho .chip:hover:not(:disabled) {
+  border-color: var(--borda-forte);
+}
+
+.pintar-trecho .chip-texto {
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-p);
+  background: var(--fundo);
+  color: var(--texto-fraco);
+  font-size: 11px;
+  cursor: pointer;
+  transition: border-color var(--rapido), color var(--rapido);
+}
+.pintar-trecho .chip-texto:hover:not(:disabled) {
+  border-color: var(--borda-forte);
+  color: var(--texto);
+}
+
+/* ---- opções (grade de escolha única) ---- */
+
+.opcoes {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 5px;
+}
+.opcoes.tres {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.opcao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 7px;
+  border-radius: var(--raio-p);
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  font-size: 11.5px;
+  font-weight: 500;
+  text-align: center;
+  transition: background var(--rapido), border-color var(--rapido),
+    color var(--rapido);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.opcao:hover:not(:disabled) {
+  background: var(--painel-alto);
+  border-color: var(--borda-forte);
+}
+.opcao:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+.opcao.ativa {
+  background: var(--destaque-fraco);
+  border-color: var(--destaque);
+  color: var(--destaque-claro);
+}
+
+/* ---- interruptor ----
+   Chavinha de verdade em vez das palavras "ligado"/"desligado": lê-se de
+   relance e ocupa metade do espaço. */
+.chave {
+  flex: 0 0 38px;
+  width: 38px;
+  height: 21px;
+  border-radius: 99px;
+  background: var(--borda);
+  border: 1px solid transparent;
+  position: relative;
+  transition: background var(--medio);
+  margin-left: auto;
+}
+.chave::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 15px;
+  height: 15px;
+  border-radius: 99px;
+  background: var(--texto-medio);
+  transition: transform var(--medio), background var(--medio);
+}
+.chave.ativa {
+  background: var(--destaque);
+}
+.chave.ativa::after {
+  transform: translateX(17px);
+  background: #fff;
+}
+
+/* ---- cantos do PiP ---- */
+
+.cantos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  width: 116px;
+}
+.canto {
+  height: 34px;
+  border-radius: var(--raio-p);
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  position: relative;
+  transition: border-color var(--rapido), background var(--rapido);
+}
+.canto:hover {
+  border-color: var(--borda-forte);
+}
+.canto i {
+  position: absolute;
+  width: 11px;
+  height: 8px;
+  border-radius: 2px;
+  background: var(--texto-fraco);
+  transition: background var(--rapido);
+}
+.canto.ativa {
+  border-color: var(--destaque);
+  background: var(--destaque-fraco);
+}
+.canto.ativa i {
+  background: var(--destaque);
+}
+
+/* ---- estado vazio ---- */
+
+.vazio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--texto-fraco);
+  text-align: center;
+  padding: 40px 20px;
+  line-height: 1.6;
+  font-size: 12.5px;
+}
+.vazio .lucide {
+  color: var(--borda-forte);
+}
+
+/* ---- cartão ---- */
+
+.cartao {
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio);
+  padding: 11px;
+  margin-bottom: 7px;
+  transition: border-color var(--rapido);
+}
+.cartao:hover {
+  border-color: var(--borda-forte);
+}
+.cartao-topo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+  margin-bottom: 9px;
+}
+.cartao-topo strong {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.apagar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--texto-fraco);
+  padding: 4px;
+  border-radius: var(--raio-p);
+  line-height: 1;
+  transition: color var(--rapido), background var(--rapido);
+}
+.apagar:hover {
+  color: var(--perigo);
+  background: var(--perigo-fraco);
+}
+
+/* ---- avisos ---- */
+
+.alerta {
+  display: flex;
+  gap: 9px;
+  padding: 10px 11px;
+  border-radius: var(--raio-p);
+  font-size: 11.5px;
+  line-height: 1.55;
+  margin-bottom: 10px;
+  background: var(--aviso-fraco);
+  border: 1px solid rgba(255, 176, 32, 0.3);
+  color: #ffcf7a;
+}
+.alerta .lucide {
+  margin-top: 1px;
+  color: var(--aviso);
+}
+.alerta strong {
+  color: #ffe0ad;
+}
+
+/* ============================================================== timeline == */
+
+.linha-do-tempo {
+  background: var(--painel);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.tl-barra {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--borda);
+  flex-shrink: 0;
+  min-width: 0;
+  flex-wrap: wrap;
+  background: var(--fundo);
+}
+
+.tl-tempo {
+  color: var(--texto-fraco);
+  font-size: 12px;
+}
+.tl-tempo.forte {
+  color: var(--texto);
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.tl-divisor {
+  width: 1px;
+  height: 18px;
+  background: var(--borda);
+  flex-shrink: 0;
+  margin: 0 3px;
+}
+
+.tl-rolagem {
+  overflow-x: auto;
+  /*
+    Rolagem VERTICAL também.
+
+    Era `hidden`, e fazia sentido enquanto a linha do tempo tinha um número
+    fixo de pistas: vídeo e áudio, sempre duas, sempre cabendo. Com as pistas
+    de texto e de elemento isso deixou de valer — cada lettering que se
+    sobrepõe a outro abre mais uma linha, e o que passava da altura da janela
+    simplesmente não existia pro usuário: sem barra, sem roda do mouse, sem
+    jeito de chegar lá.
+  */
+  overflow-y: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  /* sem recuo lateral aqui: quem afasta da borda é a margem do .tl-conteudo,
+     e um recuo só mantém a conta de posição simples */
+  padding: 12px 0;
+}
+
+/*
+  MARGEM e não PADDING — de propósito.
+
+  Com padding, os blocos (que são filhos normais) começavam depois dos 12px,
+  mas a agulha (position: absolute) conta a partir da borda, ou seja ANTES do
+  padding. Resultado: a agulha desenhava 12px adiantada em relação ao corte.
+  Com margem, o recuo fica fora da caixa e os dois compartilham a mesma origem.
+*/
+.tl-conteudo {
+  position: relative;
+  margin-left: 12px;
+  padding-left: 0;
+}
+
+/* ---- régua ---- */
+
+.tl-regua {
+  position: relative;
+  height: 26px;
+  cursor: pointer;
+  user-select: none;
+  border-bottom: 1px solid var(--borda);
+  margin-bottom: 9px;
+  transition: background var(--rapido);
+}
+.tl-regua:hover {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.tl-marca {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--borda);
+  pointer-events: none;
+}
+.tl-marca span {
+  position: absolute;
+  left: 6px;
+  top: 5px;
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--texto-fraco);
+  white-space: nowrap;
+}
+
+/* ---- marcadores ---- */
+
+.marcador {
+  position: absolute;
+  top: 3px;
+  width: 11px;
+  height: 14px;
+  margin-left: -1px;
+  padding: 0;
+  border-radius: 2px 5px 5px 2px;
+  background: var(--aviso);
+  border-left: 2px solid rgba(255, 255, 255, 0.35);
+  z-index: 7;
+  transition: transform var(--rapido), filter var(--rapido);
+}
+.marcador:hover {
+  transform: scale(1.3);
+  filter: brightness(1.2);
+}
+
+/* ---- agulha ---- */
+
+.agulha {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--destaque);
+  pointer-events: none;
+  z-index: 6;
+  box-shadow: 0 0 8px rgba(255, 45, 138, 0.45);
+}
+.agulha-cabeca {
+  position: absolute;
+  top: -2px;
+  left: -7px;
+  width: 16px;
+  height: 16px;
+  border-radius: 5px 5px 3px 3px;
+  background: var(--destaque);
+  cursor: ew-resize;
+  pointer-events: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  transition: transform var(--rapido);
+}
+/* alvo invisível maior que o desenho: pegar a agulha não deve exigir mira */
+.agulha-cabeca::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+}
+.agulha.arrastando .agulha-cabeca {
+  transform: scale(1.15);
+}
+
+/* quando a borda gruda, a agulha acende — é o aviso visual de que o ímã pegou */
+.agulha.grudado {
+  background: var(--ok);
+  box-shadow: 0 0 12px 2px rgba(45, 212, 167, 0.6);
+  width: 3px;
+}
+.agulha.grudado .agulha-cabeca {
+  background: var(--ok);
+  transform: scale(1.25);
+}
+
+/* ---- pistas ---- */
+
+.tl-pista {
+  position: relative;
+  height: 76px;
+  min-width: 100%;
+}
+
+.tl-pista-audio {
+  position: relative;
+  height: 46px;
+  min-width: 100%;
+  margin-top: 7px;
+}
+
+/* ---- pistas de texto e de elemento ----
+   Mais baixas que vídeo e áudio de propósito: são a camada de cima da edição,
+   não a matéria-prima. A altura menor deixa isso claro sem precisar de rótulo,
+   e ainda cabem duas pistas no mesmo espaço que uma de áudio ocuparia. */
+/* ---- seletor de fonte ---- */
+
+.seletor-fonte {
+  position: relative;
+}
+
+.seletor-fonte-botao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 9px 11px;
+  background: var(--fundo-campo, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-p);
+  color: var(--texto);
+  cursor: pointer;
+  text-align: left;
+}
+.seletor-fonte-botao:hover {
+  border-color: var(--destaque);
+}
+.seletor-fonte-botao > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* a lista flutua POR CIMA do painel — se empurrasse o conteúdo, a aba inteira
+   pularia toda vez que o dropdown abrisse */
+.seletor-fonte-lista {
+  position: absolute;
+  z-index: 60;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--fundo-2, #16161a);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-p);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.seletor-fonte-busca {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--borda);
+  color: var(--texto-fraco);
+}
+.seletor-fonte-busca .campo {
+  flex: 1;
+  min-width: 0;
+}
+
+.seletor-fonte-rolagem {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.seletor-fonte-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 11px;
+  background: none;
+  border: 0;
+  color: var(--texto);
+  cursor: pointer;
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.3;
+}
+.seletor-fonte-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.seletor-fonte-item.ativa {
+  color: var(--destaque);
+}
+.seletor-fonte-item > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+  Altura da pista.
+
+  A de texto é mais alta que a de elemento porque um lettering carrega DUAS
+  frases — a linha grande e a sublinha — e as duas aparecem na tela do vídeo.
+  Numa barra de 22px só cabia a primeira: dava pra editar um texto que você não
+  conseguia ver. Espremer as duas lado a lado também não resolveu, porque numa
+  barra de 4 segundos a sublinha era cortada logo no primeiro caractere.
+*/
+.tl-pista-faixa {
+  position: relative;
+  height: 34px;
+  min-width: 100%;
+  margin-top: 4px;
+}
+.tl-pista-faixa.elemento {
+  height: 22px;
+}
+
+.faixa {
+  position: absolute;
+  top: 0;
+  height: 34px;
+}
+.faixa.elemento {
+  height: 22px;
+  border-radius: var(--raio-p);
+  overflow: hidden;
+  cursor: grab;
+  z-index: 1;
+  transition: border-color var(--rapido), filter var(--rapido);
+}
+/* Uma cor por tipo de camada: o tipo se lê antes do rótulo, igual o verde
+   carrega "som" na trilha de áudio. */
+.faixa.texto {
+  background: linear-gradient(180deg, rgba(245, 179, 66, 0.28), rgba(245, 179, 66, 0.14));
+  border: 1px solid rgba(245, 179, 66, 0.5);
+}
+.faixa.texto:hover {
+  border-color: rgba(245, 179, 66, 0.95);
+}
+.faixa.forma {
+  background: linear-gradient(180deg, rgba(94, 234, 212, 0.26), rgba(94, 234, 212, 0.12));
+  border: 1px solid rgba(94, 234, 212, 0.5);
+}
+.faixa.forma:hover {
+  border-color: rgba(94, 234, 212, 0.95);
+}
+.faixa.imagem {
+  background: linear-gradient(180deg, rgba(167, 139, 250, 0.28), rgba(167, 139, 250, 0.14));
+  border: 1px solid rgba(167, 139, 250, 0.5);
+}
+.faixa.imagem:hover {
+  border-color: rgba(167, 139, 250, 0.95);
+}
+.faixa.video {
+  background: linear-gradient(180deg, rgba(96, 165, 250, 0.28), rgba(96, 165, 250, 0.14));
+  border: 1px solid rgba(96, 165, 250, 0.5);
+}
+.faixa.video:hover {
+  border-color: rgba(96, 165, 250, 0.95);
+}
+/* camada desligada: continua na pilha, apagada, pra não sumir do mapa */
+.faixa.oculta {
+  opacity: 0.4;
+  border-style: dashed;
+}
+
+/* ---- a pilha no painel ---- */
+
+.pilha {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 320px;
+  overflow-y: auto;
+}
+.pilha-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 8px;
+  border-radius: var(--raio-p);
+  border: 1px solid transparent;
+  cursor: pointer;
+  font-size: 12px;
+}
+.pilha-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+.pilha-item.ativa {
+  border-color: var(--destaque);
+  background: rgba(255, 255, 255, 0.06);
+}
+.pilha-icone {
+  color: var(--texto-fraco);
+  display: flex;
+}
+.pilha-nome {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.pilha-botao {
+  background: none;
+  border: 0;
+  color: var(--texto-fraco);
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  border-radius: 4px;
+}
+.pilha-botao:hover {
+  color: var(--texto);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.opcao.perigo:hover {
+  border-color: var(--ruim, #f87171);
+  color: var(--ruim, #f87171);
+}
+.faixa.ativa {
+  border-color: var(--destaque);
+  box-shadow: 0 0 0 1px var(--destaque);
+}
+.faixa.movendo {
+  cursor: grabbing;
+  filter: brightness(1.2);
+}
+
+.faixa-rotulo {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  height: 100%;
+  padding: 2px 8px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--texto);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+}
+.faixa-linha {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+.faixa-linha span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* a sublinha, recuada e apagada: é a mesma frase, em outro peso */
+.faixa-sub {
+  color: var(--texto-fraco);
+  padding-left: 16px;
+  font-weight: 400;
+}
+
+/* a onda fica atrás dos blocos e não recebe clique */
+.onda {
+  position: absolute;
+  top: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---- bloco de vídeo ---- */
+
+.bloco {
+  position: absolute;
+  top: 0;
+  height: 76px;
+  border-radius: var(--raio-p);
+  /* translúcido de propósito: a forma de onda fica atrás e precisa aparecer
+     por dentro do bloco, senão ela some e não serve pra nada */
+  background: linear-gradient(180deg, rgba(48, 55, 74, 0.82), rgba(34, 39, 52, 0.82));
+  border: 1px solid var(--borda-forte);
+  overflow: hidden;
+  cursor: pointer;
+  z-index: 1;
+  box-shadow: var(--luz-topo);
+  transition: border-color var(--rapido), background var(--rapido),
+    opacity var(--rapido);
+}
+.bloco:hover {
+  border-color: #4d5670;
+  background: linear-gradient(180deg, rgba(56, 64, 85, 0.85), rgba(40, 46, 61, 0.85));
+}
+.bloco.ativa {
+  border-color: var(--destaque);
+  box-shadow: var(--luz-topo), 0 0 0 1px var(--destaque),
+    0 0 16px rgba(255, 45, 138, 0.2);
+}
+.bloco.viajando {
+  opacity: 0.42;
+  cursor: grabbing;
+}
+
+.bloco-rotulo {
+  padding: 7px 10px;
+  font-size: 11px;
+  pointer-events: none;
+  user-select: none;
+  position: relative;
+  z-index: 2;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+.bloco-rotulo b {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-bottom: 3px;
+}
+.bloco-rotulo span {
+  color: var(--texto-medio);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* onde o bloco arrastado vai cair */
+.marca-solta {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  margin-left: -1px;
+  background: var(--destaque);
+  box-shadow: 0 0 12px var(--destaque);
+  border-radius: 99px;
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* ---- clipe de áudio ---- */
+
+.clipe {
+  position: absolute;
+  top: 0;
+  height: 46px;
+  border-radius: var(--raio-p);
+  /* verde pra ler como "som" de relance, sem precisar ler rótulo */
+  background: linear-gradient(180deg, rgba(45, 212, 167, 0.26), rgba(45, 212, 167, 0.13));
+  border: 1px solid rgba(45, 212, 167, 0.5);
+  overflow: hidden;
+  cursor: grab;
+  z-index: 1;
+  transition: border-color var(--rapido), filter var(--rapido);
+}
+.clipe:hover {
+  border-color: rgba(45, 212, 167, 0.95);
+}
+.clipe.ativa {
+  border-color: var(--destaque);
+  box-shadow: 0 0 0 1px var(--destaque);
+}
+.clipe.movendo {
+  cursor: grabbing;
+  filter: brightness(1.2);
+}
+/* tracejado = ainda preso à cena; sólido = solto */
+.clipe.preso {
+  border-style: dashed;
+}
+
+.clipe-rotulo {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 8px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--texto);
+  pointer-events: none;
+  user-select: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+}
+
+/* ---- puxadores de aparo ---- */
+
+.puxador {
+  position: absolute;
+  top: 0;
+  width: 9px;
+  height: 100%;
+  cursor: ew-resize;
+  background: transparent;
+  transition: background var(--rapido);
+}
+.puxador:hover,
+.puxador.arrastando {
+  background: var(--destaque);
+  opacity: 0.7;
+}
+.puxador.esq {
+  left: 0;
+  border-radius: var(--raio-p) 0 0 var(--raio-p);
+}
+.puxador.dir {
+  right: 0;
+  border-radius: 0 var(--raio-p) var(--raio-p) 0;
+}
+
+/* ================================================================ teclas == */
+
+kbd {
+  font-family: inherit;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  border-bottom-width: 2px;
+  color: var(--texto-fraco);
+  white-space: nowrap;
+}
+
+/* ======================================== legenda: correção palavra a palavra */
+
+.palavra-linha {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+  padding: 3px;
+  border: 1px solid transparent;
+  border-radius: var(--raio-p);
+  transition: border-color var(--rapido);
+}
+.palavra-tempo {
+  flex: 0 0 50px;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--texto-fraco);
+  padding: 4px 5px;
+  border-radius: 4px;
+  text-align: left;
+  transition: color var(--rapido), background var(--rapido);
+}
+.palavra-tempo:hover {
+  color: var(--destaque-claro);
+  background: var(--destaque-fraco);
+}
+.palavra-linha input {
+  flex: 1;
+  padding: 5px 8px;
+  font-size: 12px;
+}
+.palavra-enfase {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 26px;
+  height: 26px;
+  border-radius: var(--raio-p);
+  color: var(--borda-forte);
+  transition: color var(--rapido), background var(--rapido);
+}
+.palavra-enfase:hover {
+  color: var(--texto-medio);
+  background: var(--painel-alto);
+}
+.palavra-enfase.ativa {
+  color: var(--destaque);
+  background: var(--destaque-fraco);
+}
+
+/* ================================================ nuvem de palavras (Auto) == */
+
+/* A transcrição inteira como fichas clicáveis. Clicar marca pra sair do vídeo.
+   Rolagem própria porque um anúncio de 60s já passa de 150 palavras. */
+.nuvem-palavras {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 9px;
+  background: var(--fundo);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-p);
+}
+
+.ficha {
+  background: var(--painel-alto);
+  border: 1px solid transparent;
+  color: var(--texto-medio);
+  border-radius: 5px;
+  padding: 3px 7px;
+  font-size: 12px;
+  line-height: 1.3;
+  transition: background var(--rapido), color var(--rapido),
+    border-color var(--rapido);
+}
+.ficha:hover {
+  background: var(--painel-topo);
+  color: var(--texto);
+}
+/* Riscada e apagada: dá pra ler a frase inteira e ver o que vai sumir. */
+.ficha.fora {
+  background: var(--destaque-vidro);
+  border-color: rgba(255, 45, 138, 0.5);
+  color: var(--texto-fraco);
+  text-decoration: line-through;
+}
+
+/* ============================================================== imagens == */
+
+.grade-imagens {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.mini-imagem {
+  aspect-ratio: 1;
+  padding: 4px;
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-p);
+  /* xadrez discreto: PNG com fundo transparente precisa ser reconhecido como
+     transparente, senão parece que o recorte ficou branco */
+  background-color: var(--fundo);
+  background-image: linear-gradient(45deg, #1a1d23 25%, transparent 25%),
+    linear-gradient(-45deg, #1a1d23 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #1a1d23 75%),
+    linear-gradient(-45deg, transparent 75%, #1a1d23 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0;
+  cursor: pointer;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  transition: border-color var(--rapido), transform var(--rapido);
+}
+.mini-imagem:hover {
+  border-color: var(--destaque);
+  transform: translateY(-1px);
+}
+.mini-imagem img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+/* ============================================================== flutuantes == */
+
+.recado {
+  position: fixed;
+  bottom: 26px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--painel-topo);
+  border: 1px solid var(--ok);
+  color: var(--texto);
+  padding: 11px 18px;
+  border-radius: var(--raio-g);
+  font-size: 12.5px;
+  font-weight: 500;
+  z-index: 250;
+  box-shadow: var(--sombra-g);
+  animation: sobe 0.24s var(--curva);
+}
+.recado .lucide {
+  color: var(--ok);
+}
+.recado.ruim {
+  border-color: var(--perigo);
+}
+.recado.ruim .lucide {
+  color: var(--perigo);
+}
+@keyframes sobe {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+}
+
+.diag {
+  position: fixed;
+  top: 64px;
+  left: 18px;
+  width: 236px;
+  background: rgba(19, 21, 25, 0.96);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-g);
+  padding: 13px 15px;
+  z-index: 150;
+  box-shadow: var(--sombra-g);
+}
+.diag-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+.diag-linha {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  font-size: 12px;
+}
+.diag-linha span {
+  color: var(--texto-fraco);
+}
+.diag-nota {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--borda);
+  font-size: 11px;
+  color: var(--texto-fraco);
+  line-height: 1.5;
+}
+
+.atalhos {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  animation: aparece 0.16s var(--curva);
+}
+@keyframes aparece {
+  from {
+    opacity: 0;
+  }
+}
+.atalhos-caixa {
+  background: var(--painel);
+  border: 1px solid var(--borda);
+  border-radius: 16px;
+  padding: 24px 28px;
+  max-width: 580px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: var(--sombra-g);
+  animation: cresce 0.2s var(--curva);
+}
+@keyframes cresce {
+  from {
+    opacity: 0;
+    transform: scale(0.97) translateY(6px);
+  }
+}
+.atalhos-caixa h3 {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+.atalhos-linha {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--borda);
+  font-size: 12.5px;
+}
+.atalhos-linha:last-child {
+  border-bottom: none;
+}
+.atalhos-linha span {
+  color: var(--texto-medio);
+}
+
+.log {
+  background: var(--palco);
+  border: 1px solid var(--borda);
+  border-radius: var(--raio-p);
+  padding: 10px 11px;
+  font-family: ui-monospace, "Cascadia Mono", Consolas, monospace;
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--texto-fraco);
+  max-height: 220px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin-top: 10px;
+}
+
+.carregando {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--texto-fraco);
+  flex-direction: column;
+  gap: 12px;
+}
+.carregando .lucide {
+  animation: gira 1.1s linear infinite;
+  color: var(--destaque);
+}
+@keyframes gira {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Quem prefere menos movimento no sistema não deveria ter que aguentar o
+   nosso. Nada aqui depende de animação pra funcionar. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
